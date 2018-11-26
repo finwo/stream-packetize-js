@@ -1,11 +1,31 @@
 {
   "name": "stream-packetize",
   "version": "0.0.1",
-  "description": "",
-  "main": "index.js",
+  "description": "Ensure data events match",
+  "main": "src/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "NODE_ENV=babel jest --detectOpenHandles"
+  },
+  "devDependencies": {
+    "jest": "^23.6.0",
+    "babel-jest": "^23.6.0",
+    "babel-plugin-add-module-exports": "^1.0.0",
+    "babel-plugin-transform-class-properties": "^6.24.1",
+    "babel-preset-env": "^1.7.0",
+    "expect": "^23.6.0",
+    "jest-isa": "^0.0.4"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/finwo/stream-packetize.git"
   },
   "author": "Robin Bron <robin@finwo.nl>",
-  "license": "MIT"
+  "license": "MIT",
+  "bugs": {
+    "url": "https://gitlab.com/finwo/stream-packetize/issues"
+  },
+  "homepage": "https://gitlab.com/finwo/stream-packetize#readme",
+  "dependencies": {
+    "through": "^2.3.8"
+  }
 }
