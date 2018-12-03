@@ -48,6 +48,7 @@ packetize.decode = function (options) {
       mode = false;
 
   return through(function (chunk) {
+    if (null === chunk) return;
 
     // Add chunk to buffer
     buf = Buffer.concat([buf, Buffer.from(chunk)]);
