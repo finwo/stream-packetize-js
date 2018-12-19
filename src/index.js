@@ -75,6 +75,7 @@ packetize.decode = function (options) {
 
             // Detect packet size
             if (!~size) {
+              if (buf.length<4) break loop;
               buf[0] -= 128;
               size = buf.readUInt32BE(0);
               buf  = buf.slice(4);
