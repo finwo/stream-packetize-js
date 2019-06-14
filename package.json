@@ -1,6 +1,6 @@
 {
   "name": "stream-packetize",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "Ensure data events match",
   "main": "src/index.js",
   "scripts": {
