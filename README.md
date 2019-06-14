@@ -29,13 +29,9 @@ const packetize = require('stream-packetize'),
       nagle     = require('stream-nagle');
 
 // Initialize the encoder
-// Shown options are default
-let sender = packetize.encode({
-  base64: false, // Whether to use encoding for non-binary-safe transports
-});
+let sender = packetize.encode();
 
 // Initialize the decoder
-// Auto-detects whether base64 was used
 // Nagle used as an example of modified data timing
 let receiver = sender.pipe(nagle()).pipe(packetize.decode());
 
