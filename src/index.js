@@ -1,107 +1,64 @@
-const through = require('through');
+const EventEmitter = require('simple-ee');
 
 const packetize = module.exports = {};
+const mimicDuplex    = {
+  readable: true,
+  writable: true,
+  paused  : false,
+};
 
 packetize.encode = function (options) {
-  const opts = Object.assign({
-    base64: false, // Whether to use encoding for non-binary-safe transports
-  }, options || {});
+  const encoder = EventEmitter(Object.create({
+    write: function(chunk) {
+      if (null === chunk) return this.end();
+      const size = Buffer.alloc(4);
+      chunk      = Buffer.from(chunk);
+      size.writeUInt32BE(chunk.length,0);
+      this.emit('data',size);
+      this.emit('data',chunk);
+    },
+    end: function() {
+      this.emit('end');
+    },
+    pipe: function(destination) {
+      this.on('data', function(chunk) {
+        destination.write(chunk);
+      });
+      return destination;
+    },
+  }));
 
-
-  return through(function (chunk) {
-    chunk = Buffer.from(chunk);
-
-    if (opts.base64) {
-
-      // Write data
-      while (chunk.length) {
-        let data = chunk.slice(0, 54); // 54 bytes = 72 characters
-        chunk    = chunk.slice(data.length);
-        this.queue(data.toString('base64') + '\n');
-      }
-
-      // Package separation
-      this.queue('\n');
-
-    } else {
-
-      // Build size buffer
-      let size = Buffer.alloc(4);
-      size.writeUInt32BE(chunk.length, 0);
-      size[0] |= 128;
-
-      // Write data
-      this.queue(size);
-      this.queue(chunk);
-    }
-  });
+  Object.assign(encoder,mimicDuplex);
+  return encoder;
 };
 
 packetize.decode = function (options) {
-  const opts = Object.assign({}, options || {});
 
-  /** @var {Buffer}         buf  */
-  /** @var {Number}         size */
-  /** @var {Boolean|String} mode */
-  let buf  = Buffer.alloc(0),
-      size = -1,
-      mode = false;
+  const decoder = EventEmitter(Object.create({
+    write: function(chunk) {
+      if (null === chunk) return this.end();
+      this.buffer = Buffer.concat([this.buffer||Buffer.alloc(0),Buffer.from(chunk)]);
 
-  return through(function (chunk) {
-    if (null === chunk) return;
-
-    // Add chunk to buffer
-    buf = Buffer.concat([buf, Buffer.from(chunk)]);
-
-    // Try to output packages
-    loop:
-      while (true) {
-
-        // Buffer empty = done
-        if (!buf.length) break;
-
-        // Detect transport mode
-        if (!mode) {
-          if (buf[0] & 128) {
-            mode = 'binary';
-          } else {
-            mode = 'base64';
-          }
-        }
-
-        // Handle data
-        switch (mode) {
-          case 'binary':
-
-            // Detect packet size
-            if (!~size) {
-              if (buf.length<4) break loop;
-              buf[0] -= 128;
-              size = buf.readUInt32BE(0);
-              buf  = buf.slice(4);
-            }
-
-            // Emit data or finish loop
-            if (buf.length >= size) {
-              this.emit('data', buf.slice(0,size));
-              buf = buf.slice(size);
-              size = -1;
-            } else {
-              break loop;
-            }
-
-            break;
-          case 'base64':
-            let separator = buf.indexOf('\n\n');
-            if (~separator) {
-              this.emit('data', Buffer.from(buf.slice(0, separator).toString(), 'base64'));
-              buf = buf.slice(separator + 2);
-            } else {
-              break loop;
-            }
-            break;
-        }
+      // Try emitting a block
+      while(this.buffer.length>=4) {
+        let size = this.buffer.readUInt32BE(0);
+        if (this.buffer.length < (size+4)) break;
+        this.buffer = this.buffer.slice(4);
+        this.emit('data',this.buffer.slice(0,size));
+        this.buffer = this.buffer.slice(size);
       }
+    },
+    end: function() {
+      this.emit('end');
+    },
+    pipe: function(destination) {
+      this.on('data', function(chunk) {
+        destination.write(chunk);
+      });
+      return destination;
+    },
+  }));
 
-  });
+  Object.assign(decoder,mimicDuplex);
+  return decoder;
 };
