@@ -14,14 +14,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://gitlab.com/finwo/stream-packetize.git"
+    "url": "git://git.finwo.net/stream-packetize-js"
   },
   "author": "Robin Bron <robin@finwo.nl>",
   "license": "MIT",
-  "bugs": {
-    "url": "https://gitlab.com/finwo/stream-packetize/issues"
-  },
-  "homepage": "https://gitlab.com/finwo/stream-packetize#readme",
+  "homepage": "http://git.finwo.net/stream-packetize-js",
   "dependencies": {
     "simple-ee": "^2.0.5"
   }
