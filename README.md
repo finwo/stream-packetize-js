@@ -21,8 +21,8 @@ This package ensures the `data` events on both ends match, so you can rely on se
 
 ## Usage
 
-In the background [through][through] is used to handle streams. You can use an instance of stream-packetize as a regular
-stream.=
+Streams are handled by implementing `.write` and `data`/`end` events. This should suffice to be compatible with most
+frameworks or packages while keeping this library small and to-the-point.
 
 ```js
 const packetize = require('stream-packetize'),
@@ -56,5 +56,3 @@ nagleStream.on('data', function(chunk) {
 nagleStream.write('Hello World');
 nagleStream.write('Hello World');
 ```
-
-[through]: https://www.npmjs.com/package/through
