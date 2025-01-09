@@ -2,7 +2,7 @@
   "name": "stream-packetize",
   "version": "2.0.0-RC1",
   "description": "Packetize data streams",
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "node util/build.js",
     "postpublish": "PACKAGE_VERSION=$(jq -r .version < package.json) && PACKAGE_NAME=$(jq -r .name < package.json) && npm deprecate \"${PACKAGE_NAME}@<${PACKAGE_VERSION}\" \"Rolling release, please update to ${PACKAGE_VERSION}\"",
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https+git://github.com/finwo/stream-packetize-js"
+    "url": "git+https://github.com/finwo/stream-packetize-js.git"
   },
   "author": "Robin Bron <robin@finwo.nl>",
   "license": "MIT"
