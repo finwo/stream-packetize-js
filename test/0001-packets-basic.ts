@@ -37,7 +37,7 @@ test('Testing packetization basics', t => {
     bobRx.push(chunk);
   });
 
-  alice.sendMessage(message);
+  alice.send(message);
   t.equal(aliceIO[0].toString('hex'), 'c02ddbdcdbdddd2d99bbc0', 'Packet with markers in data are properly encoded');
 
   bobRaw.emit('data', aliceIO.shift() || Buffer.alloc(0));

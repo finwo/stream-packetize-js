@@ -88,7 +88,7 @@ export class PacketConnection extends EventEmitter<PacketConnectionEventMap> {
 
   }
 
-  sendMessage(chunk: string|Buffer): void {
+  send(chunk: string|Buffer): void {
 
     // Build message + crc
     // CAUTION: message mutates
@@ -125,7 +125,8 @@ export class PacketConnection extends EventEmitter<PacketConnectionEventMap> {
     this.streamConnection.write(message);
   }
 
-  close() {
+  close(chunk?: string|Buffer) {
+    if (chunk) this.send(chunk);
     if ('end' in this.streamConnection) {
       this.streamConnection.end();
     } else if ('close' in this.streamConnection) {
@@ -133,3 +134,5 @@ export class PacketConnection extends EventEmitter<PacketConnectionEventMap> {
     }
   }
 }
+
+export default PacketConnection;
