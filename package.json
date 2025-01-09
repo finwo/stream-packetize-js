@@ -24,6 +24,7 @@
     "type": "git",
     "url": "git+https://github.com/finwo/stream-packetize-js.git"
   },
-  "author": "Robin Bron <robin@finwo.nl>",
+  "author": "Yersa Nordman <finwo@pm.me>",
+  "funding": "https://github.com/sponsors/finwo",
   "license": "MIT"
 }
