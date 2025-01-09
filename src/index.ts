@@ -6,23 +6,22 @@
 //   Packets are encoded like SLIP: https://en.wikipedia.org/wiki/Serial_Line_Internet_Protocol
 //   A CRC16 is added to add minor validation (and discarding invalid packets, like ethernet)
 
-import { defaultMaxListeners, EventEmitter } from 'node:events';
+import { EventEmitter } from 'node:events';
 import { crc16 } from './crc16-xmodem';
 import { StreamConnection } from './types';
-import {Stream} from 'node:stream';
 
 const defaultPacketWindow = 2**20; // 1MiB
 const FRAME_END           = 0xC0;
 const FRAME_ESC           = 0xDB;
 
-const encodeTable = {
-  [FRAME_ESC]: Buffer.from([FRAME_ESC, 0xDD]),
-  [FRAME_END]: Buffer.from([FRAME_ESC, 0xDC]),
-};
-const decodeTable = {
-  [0xDC]: Buffer.from([FRAME_END]), // Transposed frame end
-  [0xDD]: Buffer.from([FRAME_ESC]), // Transposed frame escape
-};
+const encodeTable: [number,Buffer][] = [
+  [FRAME_ESC, Buffer.from([FRAME_ESC, 0xDD])],
+  [FRAME_END, Buffer.from([FRAME_ESC, 0xDC])],
+];
+
+const decodeTable = [];
+decodeTable[0xDC] = Buffer.from([FRAME_END]); // Transposed frame end
+decodeTable[0xDD] = Buffer.from([FRAME_ESC]); // Transposed frame escape
 
 interface PacketConnectionEventMap {
   message: [string|Buffer];
@@ -101,17 +100,18 @@ export class PacketConnection extends EventEmitter<PacketConnectionEventMap> {
     message.writeUInt16BE(crc, message.length - 2);
 
     // Escape any special markers in the frame
-    for(const marker in encodeTable) {
+    for(const [marker,sequence] of encodeTable) {
       let frameMarkerIndex: number;
       let frameMarkerPointer = 0;
       while((frameMarkerIndex = message.indexOf(marker, frameMarkerPointer)) >= 0) {
         message = Buffer.concat([
           message.subarray(0, frameMarkerIndex),
-          encodeTable[marker],
+          sequence,
           message.subarray(frameMarkerIndex + 1),
         ]);
-        frameMarkerPointer = frameMarkerIndex + encodeTable[marker].length;
+        frameMarkerPointer = frameMarkerIndex + sequence.length;
       }
+
     }
 
     // Wrap the frame in frame-end markers

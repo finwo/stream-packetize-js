@@ -1,19 +1,19 @@
 import { EventEmitter } from 'events';
 
-interface TcpConnectionEventMap {
+export interface TcpConnectionEventMap {
   data: [string|Buffer];
   close: [];
 }
-type TcpConnection = EventEmitter<TcpConnectionEventMap> & {
+export type TcpConnection = EventEmitter<TcpConnectionEventMap> & {
   write: (chunk: string|Buffer) => void,
   end: () => void,
 };
 
-interface SerialConnectionEventMap {
+export interface SerialConnectionEventMap {
   data: [string|Buffer];
   close: [];
 }
-type SerialConnection = EventEmitter<SerialConnectionEventMap> & {
+export type SerialConnection = EventEmitter<SerialConnectionEventMap> & {
   write: (chunk: string|Buffer) => void,
   close: () => void,
 };

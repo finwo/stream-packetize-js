@@ -37,11 +37,5 @@ test('Testing CRC-16/XMODEM', t => {
     t.notEqual(crc16(nb), 0, `inverse '${check[0].slice(0,check[0].length-2)}' resolves to non-0 with 2 consecutive bit-flips`);
   }
 
-
-
   t.end();
-
 });
-
-
-
