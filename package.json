@@ -8,6 +8,10 @@
     "postpublish": "PACKAGE_VERSION=$(jq -r .version < package.json) && PACKAGE_NAME=$(jq -r .name < package.json) && npm deprecate \"${PACKAGE_NAME}@<${PACKAGE_VERSION}\" \"Rolling release, please update to ${PACKAGE_VERSION}\"",
     "test": "find test -name '*.ts' | sort | xargs -P 1 -n 1 npx ts-node"
   },
+  "files": [
+    "README.md",
+    "dist/*"
+  ],
   "devDependencies": {
     "@types/node": "^22.10.5",
     "@types/tape": "^5.8.0",
