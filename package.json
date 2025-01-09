@@ -1,25 +1,18 @@
 {
   "name": "stream-packetize",
-  "version": "1.0.3",
-  "description": "Ensure data events match",
+  "version": "2.0.0-dev",
+  "description": "Packetize data streams",
   "main": "src/index.js",
   "scripts": {
-    "test": "jest --detectOpenHandles",
-    "postpublish": "PACKAGE_VERSION=$(cat package.json | grep \\\"version\\\" | head -1 | awk -F: '{print $2}' | sed 's/[\",]//g' | tr -d '[[:space:]]') && npm deprecate \"stream-packetize@<${PACKAGE_VERSION}\" \"Rolling release, please update to ${PACKAGE_VERSION}\""
+    "postpublish": "PACKAGE_VERSION=$(jq -r .version < package.json) && PACKAGE_NAME=$(jq -r .name < package.json) && npm deprecate \"${PACKAGE_NAME}@<${PACKAGE_VERSION}\" \"Rolling release, please update to ${PACKAGE_VERSION}\""
   },
   "devDependencies": {
-    "expect": "^23.6.0",
-    "jest": "^23.6.0",
-    "stream-nagle": "^0.1.2"
+    "@types/node": "^22.10.5"
   },
   "repository": {
     "type": "git",
-    "url": "git://git.finwo.net/stream-packetize-js"
+    "url": "https+git://github.com/finwo/stream-packetize-js"
   },
   "author": "Robin Bron <robin@finwo.nl>",
-  "license": "MIT",
-  "homepage": "http://git.finwo.net/stream-packetize-js",
-  "dependencies": {
-    "simple-ee": "^2.0.5"
-  }
+  "license": "MIT"
 }
