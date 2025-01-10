@@ -9,6 +9,7 @@
 import { EventEmitter } from 'node:events';
 import { crc16 } from './crc16-xmodem';
 import { StreamConnection } from './types';
+export * from './types';
 
 const defaultPacketWindow = 2**20; // 1MiB
 const FRAME_END           = 0xC0;
