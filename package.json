@@ -27,5 +27,8 @@
   },
   "author": "Yersa Nordman <finwo@pm.me>",
   "funding": "https://github.com/sponsors/finwo",
-  "license": "MIT-0"
+  "license": "MIT-0",
+  "dependencies": {
+    "@finwo/crc16-xmodem": "^1.0.2"
+  }
 }

@@ -7,7 +7,7 @@
 //   A CRC16 is added to add minor validation (and discarding invalid packets, like ethernet)
 
 import { EventEmitter } from 'node:events';
-import { crc16 } from './crc16-xmodem';
+import { crc16 } from '@finwo/crc16-xmodem';
 import { StreamConnection } from './types';
 export * from './types';
 
