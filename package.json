@@ -6,7 +6,8 @@
   "scripts": {
     "build": "node util/build.js",
     "postpublish": "PACKAGE_VERSION=$(jq -r .version < package.json) && PACKAGE_NAME=$(jq -r .name < package.json) && npm deprecate \"${PACKAGE_NAME}@<${PACKAGE_VERSION}\" \"Rolling release, please update to ${PACKAGE_VERSION}\"",
-    "test": "find test -name '*.ts' | sort | xargs -P 1 -n 1 npx ts-node"
+    "test": "find test -name '*.ts' | sort | xargs -P 1 -n 1 npx ts-node",
+    "prepublishOnly": "npm run build"
   },
   "files": [
     "README.md",
