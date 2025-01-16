@@ -137,3 +137,7 @@ export class PacketConnection extends EventEmitter<PacketConnectionEventMap> {
 }
 
 export default PacketConnection;
+
+export function isPacketConnection(subject: unknown): subject is PacketConnection {
+  return subject instanceof PacketConnection;
+}

@@ -19,3 +19,17 @@ export type SerialConnection = EventEmitter<SerialConnectionEventMap> & {
 };
 
 export type StreamConnection = TcpConnection | SerialConnection;
+
+export function isStreamConnection(subject: unknown): subject is StreamConnection {
+  if (!subject) return false;
+  if ('object' !== typeof subject) return false;
+
+  // @ts-ignore We're a typeguard, you blithering idiot of a language
+  if ('function' !== typeof subject.write) return false;
+  // @ts-ignore We're a typeguard, you blithering idiot of a language
+  if ('function' !== typeof subject.close) return false;
+  // @ts-ignore We're a typeguard, you blithering idiot of a language
+  if ('function' !== typeof subject.on) return false;
+
+  return true;
+}
