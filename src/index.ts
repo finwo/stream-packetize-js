@@ -9,6 +9,10 @@
 import { EventEmitter } from 'node:events';
 import { crc16 } from '@finwo/crc16-xmodem';
 import { StreamConnection } from './types';
+import { sha256 } from 'js-sha256';
+import { randomBytes } from 'node:crypto';
+import aesjs from 'aes-js';
+
 export * from './types';
 
 const defaultPacketWindow = 2**20; // 1MiB
@@ -31,7 +35,10 @@ interface PacketConnectionEventMap {
 
 export type PacketConnectionOptions = {
   packetWindow: number;
+  passPhrase: false|string|Buffer;
 };
+
+const keys = new WeakMap<object, false|Buffer>();
 
 export class PacketConnection extends EventEmitter<PacketConnectionEventMap> {
   constructor(private streamConnection: StreamConnection, options?: Partial<PacketConnectionOptions>) {
@@ -39,7 +46,11 @@ export class PacketConnection extends EventEmitter<PacketConnectionEventMap> {
 
     const opts: PacketConnectionOptions = Object.assign({
       packetWindow: defaultPacketWindow,
+      passPhrase: false,
     }, options || {});
+
+    const encryptionKey = opts.passPhrase ? Buffer.from(sha256.array(opts.passPhrase)) : false;
+    keys.set(this, encryptionKey);
 
     let ingressBuffer = Buffer.alloc(0);
 
@@ -82,6 +93,14 @@ export class PacketConnection extends EventEmitter<PacketConnectionEventMap> {
         if (crc16(frame)) continue;
         // Remove crc from frame
         frame = frame.subarray(0, frame.length - 2);
+
+        // Decrypt frame
+        if (encryptionKey) {
+          const iv     = frame.readUint32BE(0);
+          const aesCtr = new aesjs.ModeOfOperation.ctr(encryptionKey, new aesjs.Counter(iv));
+          frame        = Buffer.from(aesCtr.decrypt(frame.subarray(4)));
+        }
+
         // Emit the received frame
         this.emit('message', frame);
       }
@@ -90,6 +109,18 @@ export class PacketConnection extends EventEmitter<PacketConnectionEventMap> {
   }
 
   send(chunk: string|Buffer): void {
+
+    // Encrypt frame
+    const encryptionKey = keys.get(this);
+    if (encryptionKey) {
+      const _iv    = randomBytes(4);
+      const iv     = _iv.readUint32BE(0);
+      const aesCtr = new aesjs.ModeOfOperation.ctr(encryptionKey, new aesjs.Counter(iv));
+      chunk        = Buffer.concat([
+        _iv,
+        aesCtr.encrypt(Buffer.from(chunk)),
+      ]);
+    }
 
     // Build message + crc
     // CAUTION: message mutates
@@ -139,5 +170,12 @@ export class PacketConnection extends EventEmitter<PacketConnectionEventMap> {
 export default PacketConnection;
 
 export function isPacketConnection(subject: unknown): subject is PacketConnection {
-  return subject instanceof PacketConnection;
+  if (subject instanceof PacketConnection) return true;
+  // @ts-ignore
+  if ('function' !== subject.send) return false;
+  // @ts-ignore
+  if ('function' !== subject.close) return false;
+  // @ts-ignore
+  if ('function' !== subject.on) return false;
+  return true;
 }
