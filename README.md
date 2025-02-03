@@ -28,7 +28,7 @@ websocket-like interface.
 
 So, to wrap a connection, you simple create a new PacketConnection instance with the stream as it's argument.
 
-```ts
+```typescript
 import { PacketConnection } from 'stream-packetize';
 // Or
 import PacketConnection from 'stream-packetize';
@@ -54,6 +54,32 @@ server.on('connection', sock => {
   // Packetize a tcp connection
   const packeted = new PacketConnection(sock);
 
+});
+```
+
+### Encrypting a stream
+
+To keep communications somewhat private, this library supports encrypting all packets using aes-256-ctr. To enable it,
+include a passphrase in the options while wrapping the target connection.
+
+```typescript
+const packeted = new PacketConnection(port, {
+  passphrase: 'supers3cret', // Does not need to be 32 bytes, it's pulled through sha256 (no salt, 1 round)
+});
+```
+
+### Changing receive window
+
+By default, there's a maximum 1MiB window for detecting packet delimiters. To change this window to save memory or to
+increase the maximum ingress packet size, you can include the `packetWindow` options while wrapping the target
+connection.
+
+Keep in mind that the window applies to the encoded packets, which are longer than the un-encoded packets by 2 bytes or
+more.
+
+```typescript
+const packeted = new PacketConnection(port, {
+  packetWindow: 2**18, // Changes the packet detection window to 256KiB
 });
 ```
 

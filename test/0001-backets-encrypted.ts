@@ -27,10 +27,10 @@ test('Testing packetization basics', t => {
 
   const aliceRaw   = new MockConnection(aliceIO);
   const bobRaw     = new MockConnection(bobIO);
-  const passPhrase = randomBytes(15); // Intentionally not 32bytes/256bit
+  const passphrase = randomBytes(15); // Intentionally not 32bytes/256bit
 
-  const alice = new PacketConnection(aliceRaw, { passPhrase });
-  const bob   = new PacketConnection(bobRaw, { passPhrase });
+  const alice = new PacketConnection(aliceRaw, { passphrase });
+  const bob   = new PacketConnection(bobRaw, { passphrase });
   const bobRx: Buffer[] = [];
 
   bob.on('message', chunk => {

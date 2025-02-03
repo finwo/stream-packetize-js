@@ -35,7 +35,7 @@ interface PacketConnectionEventMap {
 
 export type PacketConnectionOptions = {
   packetWindow: number;
-  passPhrase: false|string|Buffer;
+  passphrase: false|string|Buffer;
 };
 
 const keys = new WeakMap<object, false|Buffer>();
@@ -46,10 +46,10 @@ export class PacketConnection extends EventEmitter<PacketConnectionEventMap> {
 
     const opts: PacketConnectionOptions = Object.assign({
       packetWindow: defaultPacketWindow,
-      passPhrase: false,
+      passphrase: false,
     }, options || {});
 
-    const encryptionKey = opts.passPhrase ? Buffer.from(sha256.array(opts.passPhrase)) : false;
+    const encryptionKey = opts.passphrase ? Buffer.from(sha256.array(opts.passphrase)) : false;
     keys.set(this, encryptionKey);
 
     let ingressBuffer = Buffer.alloc(0);
